@@ -4,13 +4,22 @@
 //Brad Rasmussen
 //Jacob Cox
 
+//Define
+#define REQUESTQUEUESIZE 1000
+
 //Structures and Variables
 //Disk Head
+int head = 0; 
+int averageSeekTime = 0;
 //Randomized Queue - Array? Linked List? Global or passed into function?
-//Sorted Queue 
+int randomRequestQueue[1000];
+//Sorted Queue
+int sortedRequestQueue[1000]; 
 //List of "Number of tracks traversed". Same size as above queues
+int numTracksTraversedQueue[1000];
 
 //Functions
+
 
 //main
 //initialize variables
@@ -18,6 +27,16 @@
 
 //Random Request Generator - Samira
 // -Fill the main queue with randomly generated numbers
+void RandomRequestGenerator()
+{
+    //fill in each request value
+    for(int i = 0; i < REQUESTQUEUESIZE; i++)
+    {
+        randomRequestQueue[i] = (rand() % 1000);
+        //TESTING PRINT
+        print(randomRequestQueue[i]);
+    }
+}
 
 //Manual Initialization of Queue - Brad
 
