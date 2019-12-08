@@ -13,11 +13,14 @@
 //List of "Number of tracks traversed". Same size as above queues
 
 //Functions
+void nStepScan();
+void fScan();
+void printSummary();
 
 //main
 int main (int argc, char *argv[])
 {
-    
+    printf("sup\n");
 }
 
 //initialize variables
@@ -39,7 +42,19 @@ int main (int argc, char *argv[])
 //C-SCAN - Brad
 
 //N-STEP-Scan - Jake
+void nStepScan()
+{
+
+}
 
 //FSCAN - Jake
+void fScan()
+{
+
+}
 
 //Print Summary Table -Jake
+void printSummary()
+{
+
+}
