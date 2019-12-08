@@ -4,6 +4,9 @@
 //Brad Rasmussen
 //Jacob Cox
 
+//includes
+#include <stdio.h>
+#include <stdlib.h>
 //Define
 #define REQUESTQUEUESIZE 1000
 
@@ -27,7 +30,8 @@ void printSummary();
 //main
 int main(int argc, char *argv[])
 {
-    RandomRequestGenerator() return 0;
+    RandomRequestGenerator();
+    return 0;
 }
 //initialize variables
 //call policy functions
@@ -39,9 +43,7 @@ void RandomRequestGenerator()
     //fill in each request value
     for (int i = 0; i < REQUESTQUEUESIZE; i++)
     {
-        randomRequestQueue[i] = (rand() % 1000);
-        //TESTING PRINT
-        print(randomRequestQueue[i]);
+        randomRequestQueue[i] = (rand() % 200) - 1;
     }
 }
 
