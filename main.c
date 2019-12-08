@@ -4,6 +4,8 @@
 //Brad Rasmussen
 //Jacob Cox
 
+#include<stdio.h> 
+
 //Structures and Variables
 //Disk Head
 //Randomized Queue - Array? Linked List? Global or passed into function?
@@ -13,6 +15,11 @@
 //Functions
 
 //main
+int main (int argc, char *argv[])
+{
+    
+}
+
 //initialize variables
 //call policy functions
 
