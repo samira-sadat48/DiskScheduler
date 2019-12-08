@@ -4,30 +4,39 @@
 //Brad Rasmussen
 //Jacob Cox
 
-#include<stdio.h> 
+//Define
+#define REQUESTQUEUESIZE 1000
 
 //Structures and Variables
 //Disk Head
+int head = 0; 
+int averageSeekTime = 0;
 //Randomized Queue - Array? Linked List? Global or passed into function?
-//Sorted Queue 
+int randomRequestQueue[1000];
+//Sorted Queue
+int sortedRequestQueue[1000]; 
 //List of "Number of tracks traversed". Same size as above queues
+int numTracksTraversedQueue[1000];
 
 //Functions
-void nStepScan();
-void fScan();
-void printSummary();
+
 
 //main
-int main (int argc, char *argv[])
-{
-    printf("sup\n");
-}
-
 //initialize variables
 //call policy functions
 
 //Random Request Generator - Samira
 // -Fill the main queue with randomly generated numbers
+void RandomRequestGenerator()
+{
+    //fill in each request value
+    for(int i = 0; i < REQUESTQUEUESIZE; i++)
+    {
+        randomRequestQueue[i] = (rand() % 1000);
+        //TESTING PRINT
+        print(randomRequestQueue[i]);
+    }
+}
 
 //Manual Initialization of Queue - Brad
 
@@ -42,19 +51,7 @@ int main (int argc, char *argv[])
 //C-SCAN - Brad
 
 //N-STEP-Scan - Jake
-void nStepScan()
-{
-
-}
 
 //FSCAN - Jake
-void fScan()
-{
-
-}
 
 //Print Summary Table -Jake
-void printSummary()
-{
-
-}
