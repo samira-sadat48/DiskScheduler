@@ -9,19 +9,26 @@
 
 //Structures and Variables
 //Disk Head
-int head = 0; 
+int head = 0;
 int averageSeekTime = 0;
 //Randomized Queue - Array? Linked List? Global or passed into function?
 int randomRequestQueue[1000];
 //Sorted Queue
-int sortedRequestQueue[1000]; 
+int sortedRequestQueue[1000];
 //List of "Number of tracks traversed". Same size as above queues
 int numTracksTraversedQueue[1000];
 
 //Functions
-
+RandomRequestGenerator();
+void nStepScan();
+void fScan();
+void printSummary();
 
 //main
+int main(int argc, char *argv[])
+{
+    RandomRequestGenerator() return 0;
+}
 //initialize variables
 //call policy functions
 
@@ -30,7 +37,7 @@ int numTracksTraversedQueue[1000];
 void RandomRequestGenerator()
 {
     //fill in each request value
-    for(int i = 0; i < REQUESTQUEUESIZE; i++)
+    for (int i = 0; i < REQUESTQUEUESIZE; i++)
     {
         randomRequestQueue[i] = (rand() % 1000);
         //TESTING PRINT
@@ -51,7 +58,16 @@ void RandomRequestGenerator()
 //C-SCAN - Brad
 
 //N-STEP-Scan - Jake
+void nStepScan()
+{
+}
 
 //FSCAN - Jake
+void fScan()
+{
+}
 
 //Print Summary Table -Jake
+void printSummary()
+{
+}
