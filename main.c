@@ -22,23 +22,26 @@
 #define REQUESTQUEUESIZE 1000
 //guarantees printing every detail when made value set to 1
 #define PRINTVERBOSE 0
+#define RANGE 200
+#define HEADSTART 0 //0-(RANGE-1)
 
 /*
  * Structures and Variables
  */
 
 //Disk Head
-int head = 100;
+int head = HEADSTART;
 int averageSeekTime = 0;
 //Randomized Queue - Array? Linked List? Global or passed into function?
-int randomRequestQueue[1000];
+int randomRequestQueue[REQUESTQUEUESIZE];
 //Sorted Queue
-int sortedRequestQueue[1000];
-//List of "Number of tracks traversed". Same size as above queues
-int numTracksTraversedQueue[1000];
+//int sortedRequestQueue[REQUESTQUEUESIZE];
+
 
 //Functions
 void RandomRequestGenerator();
+void fifo();
+void lifo();
 void bubbleSort(int arr[], int n);
 void nStepScan(int N);
 void fScan();
@@ -47,7 +50,10 @@ void printSummary();
 //main
 int main(int argc, char *argv[])
 {
+    srand(time(0));
     RandomRequestGenerator();
+    fifo();
+    lifo();
     nStepScan(7);
     return 0;
 }
@@ -61,15 +67,85 @@ void RandomRequestGenerator()
     //fill in each request value
     for (int i = 0; i < REQUESTQUEUESIZE; i++)
     {
-        randomRequestQueue[i] = (rand() % 200);
+        randomRequestQueue[i] = (rand() % RANGE);
     }
 }
 
 //Manual Initialization of Queue - Brad
 
 //FIFO - Samira
+void fifo()
+{
+    //List of "Number of tracks traversed". Same size as above queues
+    int numTracksTraversedQueue[REQUESTQUEUESIZE];
+    int fifoRequestQueue[REQUESTQUEUESIZE];
+    int averageSeekTime = 0;
+    int cumulativeSum = 0;
+
+    //Move head and calculate traverse time
+    for (int i = 0;i<REQUESTQUEUESIZE;i++)
+    {
+
+        fifoRequestQueue[i] = randomRequestQueue[i];
+        numTracksTraversedQueue[i] = abs(head - fifoRequestQueue[i]);
+        cumulativeSum = cumulativeSum + numTracksTraversedQueue[i];
+
+        head = fifoRequestQueue[i];
+    }
+    //calulate average
+    averageSeekTime = cumulativeSum / REQUESTQUEUESIZE;
+
+    //TODO: Call a print function to print this result column
+    //TEMP PRINT
+    /*printf("Request | Num Tracks Traversed\n");
+    for(int j = 0; j<REQUESTQUEUESIZE; j++)
+    {
+        printf("%03d",fifoRequestQueue[j]);
+        printf(" | ");
+        printf("%d\n",numTracksTraversedQueue[j]);
+    }*/
+    
+}
 
 //LIFO - Samira
+void lifo()
+{
+    //List of "Number of tracks traversed". Same size as above queues
+    int numTracksTraversedQueue[REQUESTQUEUESIZE];
+    int lifoRequestQueue[REQUESTQUEUESIZE];
+    int averageSeekTime = 0;
+    int cumulativeSum = 0;
+
+    //Reverse queue order, 
+    for (int i = REQUESTQUEUESIZE-1;i>=0;i--)
+    {
+        int requestIndex = (REQUESTQUEUESIZE - 1 )-i;
+        lifoRequestQueue[i] = randomRequestQueue[requestIndex];
+    }
+    //Move head , and calculate traverse time
+    for (int i = 0;i<REQUESTQUEUESIZE;i++)
+    {
+        numTracksTraversedQueue[i] = abs(head - lifoRequestQueue[i]);
+        cumulativeSum = cumulativeSum + numTracksTraversedQueue[i];
+
+        head = lifoRequestQueue[i];
+    }
+    //calulate average
+    averageSeekTime = cumulativeSum / REQUESTQUEUESIZE;
+
+    //TODO: Call a print function to print this result column
+    //TEMP PRINT
+    /*printf("RequestQueue | LifoQueue | Num Tracks Traversed\n");
+    for(int j = 0; j<REQUESTQUEUESIZE; j++)
+    {
+        printf("%03d",randomRequestQueue[j]);
+        printf(" | ");
+        printf("%03d",lifoRequestQueue[j]);
+        printf(" | ");
+        printf("%d\n",numTracksTraversedQueue[j]);
+    }*/
+    
+}
 
 //Shortest Service Time First - Samira
 
