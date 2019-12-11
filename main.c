@@ -1,9 +1,9 @@
 /* 
  * Disk Scheduler
+ * 
  * Samira Sadat
  * Brad Rasmussen
  * Jacob Cox
- * 
  */
 
 /*
@@ -77,7 +77,14 @@ void RandomRequestGenerator()
 
 //C-SCAN - Brad
 
-//N-STEP-Scan - Jake
+/* 
+ * N-Step-Scan
+ * 
+ * @param 
+ * @param 
+ * 
+ * @return 
+ */
 void nStepScan(int N)
 {
     // Declare Variables
@@ -174,12 +181,30 @@ void nStepScan(int N)
     printSummary("N-Step-Scan", outputTracksAccessed, outputTracksTraversed, REQUESTQUEUESIZE, REQUESTQUEUESIZE, total);
 }
 
-//FSCAN - Jake
+/* 
+ * F Scan
+ * 
+ * @param 
+ * @param 
+ * 
+ * @return 
+ */
 void fScan()
 {
 }
 
-//Print Summary Table -Jake
+/* 
+ * Print Summary, used to print the data and information after each simulation test
+ * 
+ * @param char title[] : A string of text that holds the title of the simulation
+ * @param int nextTrack[] : The array of integers that holds all tracks in order of traversal
+ * @param int TraversedTrack[] : The array of integers that holds the number of tracks traversed in same order as nextTrack
+ * @param int lengthNextTrack : The length of nextTrack
+ * @param int lengthTraversedTrack : The length of TraversedTrack
+ * @param int avgSeekLength : The average seek length calculated for output
+ * 
+ * @return void
+ */
 void printSummary(char title[15], int nextTrack[], int traversedTrack[], int lengthNextTrack, int lengthTraversedTrack, int avgSeekLength)
 {
     //If the lengths of both arrays are not the same, do not do anything and print an error
@@ -230,6 +255,14 @@ void printSummary(char title[15], int nextTrack[], int traversedTrack[], int len
     }
 }
 
+/* 
+ * Bubble Sort Method
+ * 
+ * @param int arr[] : The array of integers to be sorted least to greatest
+ * @param int n : The number of elements inside the array to be sorted
+ * 
+ * @return void
+ */
 void bubbleSort(int arr[], int n)
 {
     int i, j;
