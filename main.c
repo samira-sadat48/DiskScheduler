@@ -1,17 +1,32 @@
-//Disk Scheduler
-//Team Members:
-//Samira Sadat
-//Brad Rasmussen
-//Jacob Cox
+/* 
+ * Disk Scheduler
+ * Samira Sadat
+ * Brad Rasmussen
+ * Jacob Cox
+ * 
+ */
 
-//includes
+/*
+ * Includes
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-//Define
-#define REQUESTQUEUESIZE 1000
 
-//Structures and Variables
+/*
+ * Define
+ */
+
+//sets the total amount of requests to be made in the simulation
+#define REQUESTQUEUESIZE 1000
+//guarantees printing every detail when made value set to 1
+#define PRINTVERBOSE 0
+
+/*
+ * Structures and Variables
+ */
+
 //Disk Head
 int head = 100;
 int averageSeekTime = 0;
@@ -165,21 +180,21 @@ void fScan()
 }
 
 //Print Summary Table -Jake
-void printSummary(char string[15], int nextTrack[], int traversedTrack[], int lengthNextTrack, int lengthTraversedTrack, int avgSeekLength)
+void printSummary(char title[15], int nextTrack[], int traversedTrack[], int lengthNextTrack, int lengthTraversedTrack, int avgSeekLength)
 {
     //If the lengths of both arrays are not the same, do not do anything and print an error
     if (lengthNextTrack == lengthTraversedTrack)
     {
         // Print the heading of the table
-        printf("\nTest: %-18s \nStarting at HEAD: %-18d\n", string, head);
+        printf("\nTest: %-18s \nStarting at HEAD: %-18d\n", title, head);
         printf("%-18s%-18s\n", "Next Track", "Traversed Tracks");
-        printf("______________    ______________\n");
+        printf("__________        ________________\n");
 
         // If the length is too long, adjust what is printed accordingly.
-        if (lengthNextTrack > 50)
+        if (!PRINTVERBOSE && lengthNextTrack > 50)
         {
             // Print the first portion
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 7; i++)
             {
                 printf("%-18d%-18d\n", nextTrack[i], traversedTrack[i]);
             }
@@ -191,7 +206,7 @@ void printSummary(char string[15], int nextTrack[], int traversedTrack[], int le
             }
 
             // Print some fo the end data
-            for (int i = (lengthNextTrack - 3); i < lengthNextTrack; i++)
+            for (int i = (lengthNextTrack - 7); i < lengthNextTrack; i++)
             {
                 printf("%-18d%-18d\n", nextTrack[i], traversedTrack[i]);
             }
@@ -205,7 +220,7 @@ void printSummary(char string[15], int nextTrack[], int traversedTrack[], int le
             }
         }
 
-        printf("________________________________\n");
+        printf("__________________________________\n");
         // Print the average seek length
         printf("%-18s: %-18d\n\n", "Average Seek Length", avgSeekLength);
     }
