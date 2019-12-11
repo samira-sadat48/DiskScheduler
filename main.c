@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 /*
  * Define
@@ -36,7 +37,6 @@ int averageSeekTime = 0;
 int randomRequestQueue[REQUESTQUEUESIZE];
 //Sorted Queue
 //int sortedRequestQueue[REQUESTQUEUESIZE];
-
 
 //Functions
 void RandomRequestGenerator();
@@ -83,7 +83,7 @@ void fifo()
     int cumulativeSum = 0;
 
     //Move head and calculate traverse time
-    for (int i = 0;i<REQUESTQUEUESIZE;i++)
+    for (int i = 0; i < REQUESTQUEUESIZE; i++)
     {
 
         fifoRequestQueue[i] = randomRequestQueue[i];
@@ -95,16 +95,7 @@ void fifo()
     //calulate average
     averageSeekTime = cumulativeSum / REQUESTQUEUESIZE;
 
-    //TODO: Call a print function to print this result column
-    //TEMP PRINT
-    /*printf("Request | Num Tracks Traversed\n");
-    for(int j = 0; j<REQUESTQUEUESIZE; j++)
-    {
-        printf("%03d",fifoRequestQueue[j]);
-        printf(" | ");
-        printf("%d\n",numTracksTraversedQueue[j]);
-    }*/
-    
+    printSummary("FIFO", numTracksTraversedQueue, fifoRequestQueue, REQUESTQUEUESIZE, REQUESTQUEUESIZE, averageSeekTime);
 }
 
 //LIFO - Samira
@@ -116,14 +107,14 @@ void lifo()
     int averageSeekTime = 0;
     int cumulativeSum = 0;
 
-    //Reverse queue order, 
-    for (int i = REQUESTQUEUESIZE-1;i>=0;i--)
+    //Reverse queue order,
+    for (int i = REQUESTQUEUESIZE - 1; i >= 0; i--)
     {
-        int requestIndex = (REQUESTQUEUESIZE - 1 )-i;
+        int requestIndex = (REQUESTQUEUESIZE - 1) - i;
         lifoRequestQueue[i] = randomRequestQueue[requestIndex];
     }
     //Move head , and calculate traverse time
-    for (int i = 0;i<REQUESTQUEUESIZE;i++)
+    for (int i = 0; i < REQUESTQUEUESIZE; i++)
     {
         numTracksTraversedQueue[i] = abs(head - lifoRequestQueue[i]);
         cumulativeSum = cumulativeSum + numTracksTraversedQueue[i];
@@ -133,18 +124,7 @@ void lifo()
     //calulate average
     averageSeekTime = cumulativeSum / REQUESTQUEUESIZE;
 
-    //TODO: Call a print function to print this result column
-    //TEMP PRINT
-    /*printf("RequestQueue | LifoQueue | Num Tracks Traversed\n");
-    for(int j = 0; j<REQUESTQUEUESIZE; j++)
-    {
-        printf("%03d",randomRequestQueue[j]);
-        printf(" | ");
-        printf("%03d",lifoRequestQueue[j]);
-        printf(" | ");
-        printf("%d\n",numTracksTraversedQueue[j]);
-    }*/
-    
+    printSummary("LIFO", numTracksTraversedQueue, lifoRequestQueue, REQUESTQUEUESIZE, REQUESTQUEUESIZE, averageSeekTime);
 }
 
 //Shortest Service Time First - Samira
@@ -169,7 +149,7 @@ void nStepScan(int N)
     int localLocation = 0;
     int queue[N];
     int fillQueue = 1;
-    int localHead = head;
+    int localHead = HEADSTART;
 
     // Output variables
     int outputTracksAccessed[REQUESTQUEUESIZE];
@@ -287,7 +267,7 @@ void printSummary(char title[15], int nextTrack[], int traversedTrack[], int len
     if (lengthNextTrack == lengthTraversedTrack)
     {
         // Print the heading of the table
-        printf("\nTest: %-18s \nStarting at HEAD: %-18d\n", title, head);
+        printf("\nTest: %-18s \nStarting at HEAD: %-18d\n", title, HEADSTART);
         printf("%-18s%-18s\n", "Next Track", "Traversed Tracks");
         printf("__________        ________________\n");
 
