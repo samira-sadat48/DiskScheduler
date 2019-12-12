@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
     fifo();
     lifo();
     nStepScan(7);
+    fScan(7);
     return 0;
 }
 //initialize variables
@@ -240,13 +241,105 @@ void nStepScan(int N)
 /* 
  * F Scan
  * 
- * @param 
- * @param 
+ * @param int N : The number of elements in the queues
  * 
- * @return 
+ * @return void
  */
-void fScan()
+void fScan(int N)
 {
+    int s = sizeof(randomRequestQueue) / sizeof(int);
+    int workingQueueOne[N];
+    int workingQueueTwo[N];
+    int masterLocation = 0;
+    int localHead = HEADSTART;
+
+    int outputTracksAccessed[REQUESTQUEUESIZE];
+    int outputLocationAccessed = 0;
+    int outputTracksTraversed[REQUESTQUEUESIZE];
+    int outputLocationTraversed = 0;
+
+    // Start the first queue off with the first set of requests.
+    for (int i = 0; i < N; i++)
+    {
+        if (i < s)
+        {
+            workingQueueTwo[i] = randomRequestQueue[i];
+            masterLocation++;
+        }
+    }
+
+    while (masterLocation < s)
+    {
+        //Simulate loading the other queue with requests
+        for (int i = 0; i < N; i++)
+        {
+            if (masterLocation + N < s)
+            {
+                workingQueueOne[i] = randomRequestQueue[masterLocation + N];
+            }
+        }
+
+        masterLocation = masterLocation + N;
+
+        //Operate with the current queues requests
+        bubbleSort(workingQueueTwo, N);
+
+        // After sort put the elements in order that they will be processed.
+        int shiftAmount = 0;
+        for (int i = 0; i < N; i++)
+        {
+            if (workingQueueTwo[i] < localHead)
+            {
+                shiftAmount++;
+            }
+        }
+
+        if (shiftAmount > 0)
+        {
+            for (int i = 0; i < shiftAmount; i++)
+            {
+                int temp = workingQueueTwo[0];
+                for (int i = 0; i < N; i++)
+                {
+                    workingQueueTwo[i] = workingQueueTwo[i + 1];
+                }
+                workingQueueTwo[N - 1] = temp;
+            }
+        }
+
+        for (int i = 0; i < N; i++)
+        {
+            int trackAccessed = workingQueueTwo[i];
+            if (trackAccessed != -1)
+            {
+                int tracksTraversed = abs(trackAccessed - localHead);
+                localHead = trackAccessed;
+
+                outputTracksAccessed[outputLocationAccessed] = trackAccessed;
+                outputTracksTraversed[outputLocationTraversed] = tracksTraversed;
+
+                outputLocationAccessed++;
+                outputLocationTraversed++;
+            }
+        }
+
+        //switch queues (technically)
+        for (int i = 0; i < N; i++)
+        {
+                workingQueueTwo[i] = workingQueueOne[i];
+        }
+    }
+
+    int total = 0;
+
+    for (int i = 0; i < REQUESTQUEUESIZE; i++)
+    {
+        total = total + outputTracksTraversed[i];
+    }
+
+    total = total / REQUESTQUEUESIZE;
+
+    printSummary("F Scan", outputTracksAccessed, outputTracksTraversed, REQUESTQUEUESIZE, REQUESTQUEUESIZE, total);
 }
 
 /* 
