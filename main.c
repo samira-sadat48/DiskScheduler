@@ -20,7 +20,7 @@
  */
 
 //sets the total amount of requests to be made in the simulation
-#define REQUESTQUEUESIZE 1000
+#define REQUESTQUEUESIZE 10
 //guarantees printing every detail when made value set to 1
 #define PRINTVERBOSE 0
 #define RANGE 200
@@ -33,15 +33,13 @@
 //Disk Head
 int head = HEADSTART;
 int averageSeekTime = 0;
-//Randomized Queue - Array? Linked List? Global or passed into function?
 int randomRequestQueue[REQUESTQUEUESIZE];
-//Sorted Queue
-//int sortedRequestQueue[REQUESTQUEUESIZE];
 
 //Functions
 void RandomRequestGenerator();
 void fifo();
 void lifo();
+void shortestServiceTimeFirst();
 void bubbleSort(int arr[], int n);
 void nStepScan(int N);
 void fScan();
@@ -52,14 +50,13 @@ int main(int argc, char *argv[])
 {
     srand(time(0));
     RandomRequestGenerator();
-    fifo();
-    lifo();
-    nStepScan(7);
-    fScan(7);
+    //fifo();
+    //lifo();
+    shortestServiceTimeFirst();
+    //nStepScan(7);
+    //fScan(7);
     return 0;
 }
-//initialize variables
-//call policy functions
 
 //Random Request Generator - Samira
 // -Fill the main queue with randomly generated numbers
@@ -129,6 +126,60 @@ void lifo()
 }
 
 //Shortest Service Time First - Samira
+void shortestServiceTimeFirst()
+{
+    int accessCount = 0;
+    int accessedIndex;
+    int requestValue;
+    int lastSeekTime = RANGE;
+    int averageSeektime = 0;
+    int cumulativeSum = 0;
+
+    //create an "accessed" array to keep track of what request has been processed
+    int requestAccessed[REQUESTQUEUESIZE] = {0};
+    int numTracksTraversedQueue[REQUESTQUEUESIZE];
+    int shortestServiceQueue[REQUESTQUEUESIZE];
+
+    //while accessed count is less than request array size
+    while(accessCount < (REQUESTQUEUESIZE))
+    {
+        lastSeekTime = RANGE;
+        //For loop - Scan the request array
+        for (int i = 0; i < REQUESTQUEUESIZE; i++)
+        {
+            int traverseTime = abs(head - randomRequestQueue[i]);
+            
+            //Compare the track head to the request value //if | track head - request value | < last difference
+            if ((traverseTime <=  lastSeekTime) && (requestAccessed[i] == 0))
+            {
+                //Store the request value, seek time, and array index 
+                requestValue = randomRequestQueue[i];
+                lastSeekTime = traverseTime;
+                accessedIndex = i;
+            }
+        }
+        //Mark the arrayIndex of accessed array as TRUE
+        requestAccessed[accessedIndex] = 1;
+        //Put the seek time into the numTracks traversed array
+        numTracksTraversedQueue[accessCount] = lastSeekTime;
+        //Put the request value into the shortest service array
+        shortestServiceQueue[accessCount] = requestValue;
+        //increment access count
+        accessCount++;
+        //reset head
+        head = randomRequestQueue[accessedIndex];
+    }
+
+    //calculate average seek time
+    for (int i = 0; i < REQUESTQUEUESIZE; i++)
+    {
+        cumulativeSum = cumulativeSum + numTracksTraversedQueue[i];
+    }
+    averageSeekTime = cumulativeSum / REQUESTQUEUESIZE;
+
+    printSummary("Shortest Serivce Time First", numTracksTraversedQueue,shortestServiceQueue,REQUESTQUEUESIZE,REQUESTQUEUESIZE, averageSeekTime);
+
+}
 
 //SCAN - Brad
 
