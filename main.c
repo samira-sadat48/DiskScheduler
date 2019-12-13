@@ -20,11 +20,13 @@
  */
 
 //sets the total amount of requests to be made in the simulation
-#define REQUESTQUEUESIZE 100000
+#define REQUESTQUEUESIZE 10000
 //guarantees printing every detail when made value set to 1
 #define PRINTVERBOSE 0
 #define RANGE 200
-#define HEADSTART 100 //0-(RANGE-1)
+#define HEADSTART 0 //0-(RANGE-1)
+#define WEIGHTED 0
+#define INTERMEDIATEQUEUESIZE 5
 
 /*
  * Structures and Variables
@@ -40,9 +42,11 @@ void RandomRequestGenerator();
 void WeightedRandomRequestGenerator();
 void fifo();
 void lifo();
+void scan();
+void cscan();
 void shortestServiceTimeFirst();
 void bubbleSort(int arr[], int n);
-void nStepScan(int N);
+void nStepScan();
 void fScan();
 void printSummary();
 void countTheCrap(int arg[]);
@@ -51,13 +55,21 @@ void countTheCrap(int arg[]);
 int main(int argc, char *argv[])
 {
     srand(time(0));
-    RandomRequestGenerator();
-    WeightedRandomRequestGenerator();
+    if(WEIGHTED == 1)
+    {
+        WeightedRandomRequestGenerator();
+    }
+    else
+    {
+        RandomRequestGenerator();
+    }
     fifo();
     lifo();
+    scan();
+    cscan(INTERMEDIATEQUEUESIZE);
     shortestServiceTimeFirst();
-    nStepScan(7);
-    fScan(7);
+    nStepScan(INTERMEDIATEQUEUESIZE);
+    fScan(INTERMEDIATEQUEUESIZE);
     return 0;
 }
 
@@ -70,28 +82,6 @@ void RandomRequestGenerator()
     {
         randomRequestQueue[i] = (rand() % RANGE);
     }
-}
-
-void countTheCrap(int arg[])
-{
-    int bob[REQUESTQUEUESIZE];
-
-    for(int i = 0; i < RANGE; i++)
-    {
-        bob[i] = 0;
-    }
-
-    for(int i = 0; i < REQUESTQUEUESIZE; i++)
-    {
-        bob[arg[i]]++;
-    }
-
-    for(int i = 0; i < RANGE; i++)
-    {
-        printf("%d \n", bob[i]);
-    }
-
-    
 }
 
 //Manual Initialization of Queue - All
@@ -298,27 +288,26 @@ void shortestServiceTimeFirst()
 //SCAN - Brad
 void scan()
 {
-    int i,j,sum=0,n;
-    int d[20];
+    int i,j,sum=0,n,average;
+    int m[REQUESTQUEUESIZE];
+    int d[REQUESTQUEUESIZE];
     int disk;   //loc of head
     int temp,max;     
     int dloc;   //loc of disk in array
 
-    clrscr();
-    n = RANGE;
     disk = HEADSTART;
 
-    printf("enter elements of disk queue\n");
-
+    n = REQUESTQUEUESIZE;
+    
     for(i=0;i<n;i++)
     {
-        scanf("%d",&d[i]);
+        d[i] = randomRequestQueue[i];
     }
     d[n]=disk;
     n=n+1;
     for(i=0;i<n;i++)    // sorting disk locations
     {
-        for(j=i;j<n;j++)
+        for(j=i;j<RANGE;j++)
         {
             if(d[i]>d[j])
             {
@@ -329,38 +318,61 @@ void scan()
         }
     }
     
-    max=d[n];
-    for(i=0;i<n;i++)   // to find loc of disc in array
+    for(int k=0;k<REQUESTQUEUESIZE;k++)
     {
-        if(disk==d[i]) 
-        { 
-            dloc=i; 
-            break;  
+        max=d[n-1];
+        for(i=0;i<n;i++)   // to find loc of disc in array
+        {
+            if(disk==d[i]) 
+            { 
+                dloc=i; 
+                m[i] = dloc;
+                break;  
+            }
         }
+        m[k] = abs(dloc - d[k]);
     }
 
-    sum=disk+max;
-    getch();
-
+    //find average
+    for (i = 0; i < REQUESTQUEUESIZE; i++)
+    {
+        sum = sum + m[i];
+    }
+    average = sum/REQUESTQUEUESIZE;
+    printSummary("scan", d, m, REQUESTQUEUESIZE, REQUESTQUEUESIZE, average);
 }
 
 //C-SCAN - Brad
-void cscan(int N)
+void cscan()
 {
-    int queue[20],n,head,i,j,k,seek=0,max,diff,temp,queue1[20],queue2[20],
-    temp1=0,temp2=0;
-    float avg;
+    int n=0;
+    int head=0;
+    int i=0,j=0,k=0;
+    int seek=0;
+    int max=0;
+    int diff=0;
+    int temp=0;
+    int temp1=0;
+    int temp2=0;
+    int traverseTimes[REQUESTQUEUESIZE];
+    int queue[REQUESTQUEUESIZE];
+    int queue1[INTERMEDIATEQUEUESIZE];
+    int queue2[INTERMEDIATEQUEUESIZE];
+    
+    float avg = 0.0;
 
     max = RANGE;
     head = HEADSTART;
-    n = N;
+    n = INTERMEDIATEQUEUESIZE;
 
-    printf("Enter the queue of disk positions to be read\n");
-    for(i=1;i<=n;i++)
+    for(i=0;i<REQUESTQUEUESIZE;i++)
     {
-        scanf("%d",&temp);
+        queue[i] = randomRequestQueue[i];
+    }
 
-        if(temp>=head)
+    for(i=0;i<n;i++)
+    {
+        if(queue[i]>=head)
         {
             queue1[temp1]=temp;
 
@@ -406,23 +418,26 @@ void cscan(int N)
         queue[i]=max;
         queue[i+1]=0;
     }
-
-    for(i=temp1+3,j=0;j<temp2;i++,j++)
+    
+    //TESTING ABOVE LOOP
+    for(i=temp1+3,j=0;i<temp2 && j<temp2;i++,j++)
     {
         queue[i]=queue2[j];
         queue[0]=head;
     }
 
-    for(j=0;j<=n+1;j++)
+    for(j=0;j<REQUESTQUEUESIZE-2;j++)
     {
         diff=abs(queue[j+1]-queue[j]);
+        traverseTimes[j] = diff;
         seek+=diff;
-        printf("Disk head moves from %d to %d with seek %d\n",queue[j],queue[j+1],diff);
     }
 
-    printf("Total seek time is %d\n",seek);
+    //printf("Total seek time is %d\n",seek);
     avg=seek/(float)n;
-    printf("Average seek time is %f\n",avg);
+    int average = (int) avg;
+    //printf("Average seek time is %f\n",avg);
+    printSummary("CSCAN", queue, traverseTimes, REQUESTQUEUESIZE, REQUESTQUEUESIZE, average);
 }
 
 /* 
@@ -433,13 +448,13 @@ void cscan(int N)
  * 
  * @return 
  */
-void nStepScan(int N)
+void nStepScan()
 {
     // Declare Variables
     int s = sizeof(randomRequestQueue) / sizeof(int);
     int masterLocation = 0;
     int localLocation = 0;
-    int queue[N];
+    int queue[INTERMEDIATEQUEUESIZE];
     int fillQueue = 1;
     int localHead = HEADSTART;
 
@@ -455,11 +470,11 @@ void nStepScan(int N)
         // If the queue has been emptied fillit again
         if (fillQueue == 1)
         {
-            for (int i = 0; i < N; i++)
+            for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
                 queue[i] = -1;
 
             localLocation = 0;
-            for (int i = 0; i < N; i++)
+            for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
             {
                 if ((masterLocation) < s)
                 {
@@ -471,11 +486,11 @@ void nStepScan(int N)
         }
 
         // After the queue has been filled, sort it from low to high
-        bubbleSort(queue, N);
+        bubbleSort(queue, INTERMEDIATEQUEUESIZE);
 
         // After sort put the elements in order that they will be processed.
         int shiftAmount = 0;
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
         {
             if (queue[i] < localHead)
             {
@@ -488,17 +503,17 @@ void nStepScan(int N)
             for (int i = 0; i < shiftAmount; i++)
             {
                 int temp = queue[0];
-                for (int i = 0; i < N; i++)
+                for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
                 {
                     queue[i] = queue[i + 1];
                 }
-                queue[N - 1] = temp;
+                queue[INTERMEDIATEQUEUESIZE - 1] = temp;
             }
         }
 
         //printf("%d \n", localHead);
 
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
         {
             int trackAccessed = queue[i];
             if (trackAccessed != -1)
@@ -536,11 +551,11 @@ void nStepScan(int N)
  * 
  * @return void
  */
-void fScan(int N)
+void fScan()
 {
     int s = sizeof(randomRequestQueue) / sizeof(int);
-    int workingQueueOne[N];
-    int workingQueueTwo[N];
+    int workingQueueOne[INTERMEDIATEQUEUESIZE];
+    int workingQueueTwo[INTERMEDIATEQUEUESIZE];
     int masterLocation = 0;
     int localHead = HEADSTART;
 
@@ -550,7 +565,7 @@ void fScan(int N)
     int outputLocationTraversed = 0;
 
     // Start the first queue off with the first set of requests.
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
     {
         if (i < s)
         {
@@ -562,22 +577,22 @@ void fScan(int N)
     while (masterLocation < s)
     {
         //Simulate loading the other queue with requests
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
         {
-            if (masterLocation + N < s)
+            if (masterLocation + INTERMEDIATEQUEUESIZE < s)
             {
-                workingQueueOne[i] = randomRequestQueue[masterLocation + N];
+                workingQueueOne[i] = randomRequestQueue[masterLocation + INTERMEDIATEQUEUESIZE];
             }
         }
 
-        masterLocation = masterLocation + N;
+        masterLocation = masterLocation + INTERMEDIATEQUEUESIZE;
 
         //Operate with the current queues requests
-        bubbleSort(workingQueueTwo, N);
+        bubbleSort(workingQueueTwo, INTERMEDIATEQUEUESIZE);
 
         // After sort put the elements in order that they will be processed.
         int shiftAmount = 0;
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
         {
             if (workingQueueTwo[i] < localHead)
             {
@@ -590,15 +605,15 @@ void fScan(int N)
             for (int i = 0; i < shiftAmount; i++)
             {
                 int temp = workingQueueTwo[0];
-                for (int i = 0; i < N; i++)
+                for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
                 {
                     workingQueueTwo[i] = workingQueueTwo[i + 1];
                 }
-                workingQueueTwo[N - 1] = temp;
+                workingQueueTwo[INTERMEDIATEQUEUESIZE - 1] = temp;
             }
         }
 
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
         {
             int trackAccessed = workingQueueTwo[i];
             if (trackAccessed != -1)
@@ -615,9 +630,9 @@ void fScan(int N)
         }
 
         //switch queues (technically)
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < INTERMEDIATEQUEUESIZE; i++)
         {
-                workingQueueTwo[i] = workingQueueOne[i];
+            workingQueueTwo[i] = workingQueueOne[i];
         }
     }
 
@@ -658,6 +673,7 @@ void printSummary(char title[15], int nextTrack[], int traversedTrack[], int len
         // If the length is too long, adjust what is printed accordingly.
         if (!PRINTVERBOSE && lengthNextTrack > 50)
         {
+    
             // Print the first portion
             for (int i = 0; i < 7; i++)
             {
@@ -678,6 +694,7 @@ void printSummary(char title[15], int nextTrack[], int traversedTrack[], int len
         }
         else
         {
+    
             // Print all of the values
             for (int i = 0; i < lengthNextTrack; i++)
             {
@@ -691,7 +708,7 @@ void printSummary(char title[15], int nextTrack[], int traversedTrack[], int len
     }
     else
     {
-        printf("\nSomething went wrong, both input and output arrays are not the same size?\n");
+        printf("\nSomething went wrong");
     }
 }
 
