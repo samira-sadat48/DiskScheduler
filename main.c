@@ -51,13 +51,13 @@ void countTheCrap(int arg[]);
 int main(int argc, char *argv[])
 {
     srand(time(0));
-    //RandomRequestGenerator();
+    RandomRequestGenerator();
     WeightedRandomRequestGenerator();
-    //fifo();
-    //lifo();
-    //shortestServiceTimeFirst();
-    //nStepScan(7);
-    //fScan(7);
+    fifo();
+    lifo();
+    shortestServiceTimeFirst();
+    nStepScan(7);
+    fScan(7);
     return 0;
 }
 
@@ -112,7 +112,7 @@ void WeightedRandomRequestGenerator()
         for (int i = 0; i < RANGE; i++)
         {   
             int furthest = 0;
-            int closest = localHead;//we never update this...
+            int closest = localHead;
             if (localHead <= (RANGE/2))
             {
                 furthest = RANGE - 1;
@@ -129,7 +129,7 @@ void WeightedRandomRequestGenerator()
             }
             else
             {
-                increment = 9.0f / (abs((float)closest - (float)furthest));
+                increment = 9.0f / (fabsf((float)closest - (float)furthest));
                 float distance = abs(localHead - i);
                 probabilityArray[i] = 10 - (increment*distance);
             }
@@ -146,8 +146,7 @@ void WeightedRandomRequestGenerator()
 
             for(int j = 0; j < RANGE; j++)
             {
-                //printf("%f  %f  %d  %d", randValue, probabilityArray[j], j, localHead);
-                if((randValue < probabilityArray[j] ) && (j < localHead))//never is true
+                if((randValue < probabilityArray[j] ) && (j < localHead))
                 {
                     if((localHead + j) < RANGE)
                     {
@@ -155,32 +154,26 @@ void WeightedRandomRequestGenerator()
                         if(r == 0)
                         {
                             randTrack = j;
-                            //printf("Spot 1\n");
-
                         }
                         else
                         {
                             randTrack = localHead + j;
-                            //printf("Spot 2\n");
                         }
                     }
                     else 
                     {
                         randTrack = j;
-                        //printf("Spot 3\n");
                     }
                     break;
                 }
-                else if(randValue < probabilityArray[j])//never is true
+                else if(randValue < probabilityArray[j])
                 {
                     randTrack = j;
-                    //printf("Spot 4\n");
                     break;
                 }
                 else
                 {
                     randValue -= probabilityArray[j];
-                    //printf("Spot 5\n");//Always goes in here
                 }
 
                 
@@ -190,14 +183,6 @@ void WeightedRandomRequestGenerator()
             localHead = randTrack;
         }
     }
-
-    for(int i = 0; i < REQUESTQUEUESIZE; i++)
-    {
-        printf("%d   \n", randomRequestQueue[i]);
-    }
-
-    printf("########################################################");
-    countTheCrap(randomRequestQueue);
 }
 
 //FIFO - Samira
@@ -311,8 +296,134 @@ void shortestServiceTimeFirst()
 }
 
 //SCAN - Brad
+void scan()
+{
+    int i,j,sum=0,n;
+    int d[20];
+    int disk;   //loc of head
+    int temp,max;     
+    int dloc;   //loc of disk in array
+
+    clrscr();
+    n = RANGE;
+    disk = HEADSTART;
+
+    printf("enter elements of disk queue\n");
+
+    for(i=0;i<n;i++)
+    {
+        scanf("%d",&d[i]);
+    }
+    d[n]=disk;
+    n=n+1;
+    for(i=0;i<n;i++)    // sorting disk locations
+    {
+        for(j=i;j<n;j++)
+        {
+            if(d[i]>d[j])
+            {
+                temp=d[i];
+                d[i]=d[j];
+                d[j]=temp;
+            }
+        }
+    }
+    
+    max=d[n];
+    for(i=0;i<n;i++)   // to find loc of disc in array
+    {
+        if(disk==d[i]) 
+        { 
+            dloc=i; 
+            break;  
+        }
+    }
+
+    sum=disk+max;
+    getch();
+
+}
 
 //C-SCAN - Brad
+void cscan(int N)
+{
+    int queue[20],n,head,i,j,k,seek=0,max,diff,temp,queue1[20],queue2[20],
+    temp1=0,temp2=0;
+    float avg;
+
+    max = RANGE;
+    head = HEADSTART;
+    n = N;
+
+    printf("Enter the queue of disk positions to be read\n");
+    for(i=1;i<=n;i++)
+    {
+        scanf("%d",&temp);
+
+        if(temp>=head)
+        {
+            queue1[temp1]=temp;
+
+            temp1++;
+        }
+        else
+        {
+            queue2[temp2]=temp;
+
+            temp2++;
+        }
+    }
+
+    for(i=0;i<temp1-1;i++)
+    {
+        for(j=i+1;j<temp1;j++)
+        {
+            if(queue1[i]>queue1[j])
+            {
+                temp=queue1[i];
+                queue1[i]=queue1[j];
+                queue1[j]=temp;
+            }
+        }
+    }
+
+    for(i=0;i<temp2-1;i++)
+    {
+        for(j=i+1;j<temp2;j++)
+        {
+            if(queue2[i]>queue2[j])
+            {
+                temp=queue2[i];
+                queue2[i]=queue2[j];
+                queue2[j]=temp;
+            }
+        }
+    }
+
+    for(i=1,j=0;j<temp1;i++,j++)
+    {
+        queue[i]=queue1[j];
+        queue[i]=max;
+        queue[i+1]=0;
+    }
+
+    for(i=temp1+3,j=0;j<temp2;i++,j++)
+    {
+        queue[i]=queue2[j];
+        queue[0]=head;
+    }
+
+    for(j=0;j<=n+1;j++)
+    {
+        diff=abs(queue[j+1]-queue[j]);
+        seek+=diff;
+        printf("Disk head moves from %d to %d with seek %d\n",queue[j],queue[j+1],diff);
+    }
+
+    printf("Total seek time is %d\n",seek);
+    avg=seek/(float)n;
+    printf("Average seek time is %f\n",avg);
+}
 
 /* 
  * N-Step-Scan
