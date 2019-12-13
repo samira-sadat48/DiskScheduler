@@ -20,11 +20,11 @@
  */
 
 //sets the total amount of requests to be made in the simulation
-#define REQUESTQUEUESIZE 10
+#define REQUESTQUEUESIZE 100000
 //guarantees printing every detail when made value set to 1
 #define PRINTVERBOSE 0
 #define RANGE 200
-#define HEADSTART 0 //0-(RANGE-1)
+#define HEADSTART 100 //0-(RANGE-1)
 
 /*
  * Structures and Variables
@@ -37,6 +37,7 @@ int randomRequestQueue[REQUESTQUEUESIZE];
 
 //Functions
 void RandomRequestGenerator();
+void WeightedRandomRequestGenerator();
 void fifo();
 void lifo();
 void shortestServiceTimeFirst();
@@ -44,15 +45,17 @@ void bubbleSort(int arr[], int n);
 void nStepScan(int N);
 void fScan();
 void printSummary();
+void countTheCrap(int arg[]);
 
 //main
 int main(int argc, char *argv[])
 {
     srand(time(0));
-    RandomRequestGenerator();
+    //RandomRequestGenerator();
+    WeightedRandomRequestGenerator();
     //fifo();
     //lifo();
-    shortestServiceTimeFirst();
+    //shortestServiceTimeFirst();
     //nStepScan(7);
     //fScan(7);
     return 0;
@@ -69,7 +72,133 @@ void RandomRequestGenerator()
     }
 }
 
-//Manual Initialization of Queue - Brad
+void countTheCrap(int arg[])
+{
+    int bob[REQUESTQUEUESIZE];
+
+    for(int i = 0; i < RANGE; i++)
+    {
+        bob[i] = 0;
+    }
+
+    for(int i = 0; i < REQUESTQUEUESIZE; i++)
+    {
+        bob[arg[i]]++;
+    }
+
+    for(int i = 0; i < RANGE; i++)
+    {
+        printf("%d \n", bob[i]);
+    }
+
+    
+}
+
+//Manual Initialization of Queue - All
+void WeightedRandomRequestGenerator()
+{
+    float probabilityArray[RANGE];
+    int localHead = HEADSTART;
+    int diskOptions[RANGE];
+    //fill in each request value
+    for (int i = 0; i < RANGE; i++)
+    {
+        diskOptions[i] = i;
+    }
+
+    for(int k = 0; k < REQUESTQUEUESIZE; k++)
+    {
+         //fill in probabilities
+        for (int i = 0; i < RANGE; i++)
+        {   
+            int furthest = 0;
+            int closest = localHead;//we never update this...
+            if (localHead <= (RANGE/2))
+            {
+                furthest = RANGE - 1;
+            }
+            else
+            {
+                furthest = 0;
+            }
+            
+            float increment = 0.0;
+            if(localHead == diskOptions[i])
+            {
+                probabilityArray[i] = 10.0;
+            }
+            else
+            {
+                increment = 9.0f / (abs((float)closest - (float)furthest));
+                float distance = abs(localHead - i);
+                probabilityArray[i] = 10 - (increment*distance);
+            }
+
+            float sum = 0.0;
+
+            for(int j = 0; j < RANGE; j++)
+            {
+                sum += probabilityArray[j];
+            }
+
+            float randValue = (rand() % (int)sum);
+            int randTrack = 0;
+
+            for(int j = 0; j < RANGE; j++)
+            {
+                //printf("%f  %f  %d  %d", randValue, probabilityArray[j], j, localHead);
+                if((randValue < probabilityArray[j] ) && (j < localHead))//never is true
+                {
+                    if((localHead + j) < RANGE)
+                    {
+                        int r = rand() % 1;
+                        if(r == 0)
+                        {
+                            randTrack = j;
+                            //printf("Spot 1\n");
+
+                        }
+                        else
+                        {
+                            randTrack = localHead + j;
+                            //printf("Spot 2\n");
+                        }
+                    }
+                    else 
+                    {
+                        randTrack = j;
+                        //printf("Spot 3\n");
+                    }
+                    break;
+                }
+                else if(randValue < probabilityArray[j])//never is true
+                {
+                    randTrack = j;
+                    //printf("Spot 4\n");
+                    break;
+                }
+                else
+                {
+                    randValue -= probabilityArray[j];
+                    //printf("Spot 5\n");//Always goes in here
+                }
+
+                
+                
+            }
+            randomRequestQueue[k] = randTrack;
+            localHead = randTrack;
+        }
+    }
+
+    for(int i = 0; i < REQUESTQUEUESIZE; i++)
+    {
+        printf("%d   \n", randomRequestQueue[i]);
+    }
+
+    printf("########################################################");
+    countTheCrap(randomRequestQueue);
+}
 
 //FIFO - Samira
 void fifo()
